@@ -1,46 +1,24 @@
 ;;; center-layout.el --- Centers windows.
 
 ;;; Commentary:
-;;
-;; # Usage
-;;
-;; Use `M-x center-layout-mode` to turn it on and off.
-;;
-;; # Customization
-;;
-;; `center-layout-columns`: desired content width, default is 80.
-;;
-;; `center-layout-apply-right-margin`: t to apply right margin, by
-;; default right margin will be set to 0 to allow text to flow to far
-;; right.
-;;
 
 ;;; Code:
 
 (defgroup center-layout nil
-  "Centers windows."
+  "Center windows."
   :group 'emacs)
 
 (defcustom center-layout-columns 80
-  "Visible number of character columns when centered."
+  "Width of centered content."
   :group 'center-layout
   :type 'number)
 
 (defcustom center-layout-apply-right-margin nil
-  "If t apply right margin with same width as left margin.
-Otherwise set right margin to 0, allowing text to flow to far right."
+  "If t right margin will be applied also.
+If nil no right margin will be applied, allowing longer lines to
+flow to the right exceeding `center-layout-columns'."
   :group 'center-layout
   :type 'boolean)
-
-(defun center-layout--which-key-window-p (window)
-  "Return t if WINDOW is a which-key window."
-  (and (boundp 'which-key-buffer-name)
-       (string= which-key-buffer-name (buffer-name (window-buffer window)))))
-
-(defun center-layout--lv-window-p (window)
-  "Return t if WINDOW is a lv (used by hydra) window."
-  (and (boundp 'lv-wnd)
-       (eq window lv-wnd)))
 
 (defun center-layout--window-body-preferred-pixels (window)
   "Return preferred body width for WINDOW.
