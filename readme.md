@@ -15,25 +15,20 @@ Invoke this within Emacs or place it in your init file:
 (center-layout-mode t)
 ```
 
-Alternatively you can also enable it via custom:
-
-```
-M-x customize-variable <return> center-layout-mode <return>
-```
+Alternatively you can also enable it within custom: <kbd>M-x</kbd>
+`customize-variable` <kbd>return</kbd> `center-layout-mode`
+<kbd>return</kbd>.
 
 ## Customization
 
-Customizations can be done via:
-
-```
-M-x customize-group <return> center-layout <return>
-```
+Customizations can be done via: <kbd>M-x</kbd> `customize-group`
+<kbd>return</kbd> `center-layout` <kbd>return</kbd>.
 
 See below for customization options.
 
 ### `center-layout-columns`
 
-Default 80. Width of centered content.
+Default `80`. Width of centered content.
 
 ### `center-layout-apply-right-margin`
 
