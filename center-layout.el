@@ -92,12 +92,39 @@ Adds EXTRA-FREE-PIXELS into the calculation."
   (walk-windows
    (lambda (window) (center-layout--update-window window))
    t
-   (if frame frame (selected-frame))))
+   (or frame (selected-frame))))
 
 (defun center-layout--advice (&rest ignored)
   "Advice for `advice-add' to update layout.
 Arguments from the adviced functions are IGNORED."
   (center-layout--update-frame))
+
+(defun center-layout--window-margins-nil (&rest args)
+  "Always return '(nil) - no margins, ARGS are ignored."
+  (list nil))
+
+(defun center-layout--window-min-size-around (func &rest args)
+  "An around advice for `window-min-size' (FUNC).
+ARGS will be passed to the function.
+
+`window-min-size' caculates the width by including the horizontal
+margins, and since `center-layout-mode' always dynamically sets
+the margins to fill available space (especially when
+`center-layout-apply-right-margin' is on), this causes Emacs to
+think that there is no available horizontal space anymore so
+spliting windows will always occur below, never to the side,
+which is undesirable, especially when trying to use side windows
+like neotree.
+
+This advice will remove the horizontal margins from the result
+which is correct behaviour since margins will be dynamically
+increased/decreased to fill available space therefore they don't
+have a fixed size, giving desired split window behavior."
+
+  (advice-add 'window-margins :around 'center-layout--window-margins-nil)
+  (let ((result (apply func args)))
+    (advice-remove 'window-margins 'center-layout--window-margins-nil)
+    result))
 
 (define-minor-mode center-layout-mode
   "Toggle center layout mode."
@@ -109,6 +136,7 @@ Arguments from the adviced functions are IGNORED."
     (add-hook 'text-scale-mode-hook 'center-layout--update-frame)
     (add-hook 'scroll-bar-mode-hook 'center-layout--update-frame)
     (advice-add 'set-fringe-mode :after 'center-layout--advice)
+    (advice-add 'window-min-size :around 'center-layout--window-min-size-around)
     (center-layout--update-frame))
    (t
     (remove-hook 'window-size-change-functions 'center-layout--update-frame)
@@ -116,6 +144,7 @@ Arguments from the adviced functions are IGNORED."
     (remove-hook 'text-scale-mode-hook 'center-layout--update-frame)
     (remove-hook 'scroll-bar-mode-hook 'center-layout--update-frame)
     (advice-remove 'set-fringe-mode 'center-layout--advice)
+    (advice-remove 'window-min-size 'center-layout--window-min-size-around)
     (walk-windows (lambda (window) (set-window-margins window 0 0)) t))))
 
 (provide 'center-layout)
