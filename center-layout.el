@@ -55,29 +55,46 @@ Adds EXTRA-FREE-PIXELS into the calculation."
     (frame-char-width (window-frame window)))
    0))
 
+(defun center-layout--frame-left-child (window)
+  "Return left most window container (or nil) of frame owning WINDOW."
+  (window-left-child (frame-root-window window)))
+
+(defun center-layout--window-eq-or-is-descendant (window ancestor)
+  "Return t if WINDOW is eq or is a descendant of ANCESTOR."
+  (cond
+   ((eq window ancestor) t)
+   ((not window) nil)
+   ((center-layout--window-eq-or-is-descendant
+     (window-parent window)
+     ancestor))))
+
+(defun center-layout--window-width-percentage (window)
+  "Return WINDOW's width as a percentage out of the frame's width."
+  (/ (float (window-total-width window))
+     (frame-width (window-frame window))))
+
 (defun center-layout--compute-margins (window)
   "Compute (LEFT-MARGIN . RIGHT_MARGIN) for WINDOW."
-  (let* (
-         ;; `window-left-column' is needed to ensure `window-prev-sibling'
-         ;; will return a window to the left, otherwise a window above
-         ;; can also be returned.
-         (dediated-window
-          (if (/= 0 (window-left-column window))
-              (window-prev-sibling window)
-            nil))
+  (let*
+      ((left-side-window
+        (let ((left (center-layout--frame-left-child window)))
+          (if (or (center-layout--window-eq-or-is-descendant window left)
+                  (< (center-layout--window-width-percentage window) 0.4))
+              nil
+            left)))
 
-         (dediated-window-pixels
-          (if dediated-window (window-pixel-width dediated-window) 0))
+       (left-side-window-pixels
+        (if left-side-window (window-pixel-width left-side-window) 0))
 
-         (dediated-window-columns
-          (if dediated-window (window-total-width dediated-window 'ceiling) 0))
+       (left-side-window-columns
+        (if left-side-window (window-total-width left-side-window 'ceiling) 0))
 
-         (margins (center-layout--free-columns window dediated-window-pixels))
-         (margin-left (- (ceiling margins 2) dediated-window-columns))
-         (margin-right
-          (if center-layout-apply-right-margin
-              (- margins dediated-window-pixels margin-left)
-            0)))
+       (margins (center-layout--free-columns window left-side-window-pixels))
+       (margin-left (- (ceiling margins 2) left-side-window-columns))
+       (margin-right
+        (if center-layout-apply-right-margin
+            (- margins left-side-window-pixels margin-left)
+          0)))
 
     `(,(max 0 margin-left) .
       ,(max 0 margin-right))))
@@ -138,8 +155,8 @@ have a fixed size, giving desired split window behavior."
     (advice-add 'set-fringe-mode :after 'center-layout--advice)
     (advice-add 'window-min-size :around 'center-layout--window-min-size-around)
     (center-layout--update-frame))
-   (t
-    (remove-hook 'window-size-change-functions 'center-layout--update-frame)
+
+   ((remove-hook 'window-size-change-functions 'center-layout--update-frame)
     (remove-hook 'window-configuration-change-hook 'center-layout--update-frame)
     (remove-hook 'text-scale-mode-hook 'center-layout--update-frame)
     (remove-hook 'scroll-bar-mode-hook 'center-layout--update-frame)
