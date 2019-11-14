@@ -58,45 +58,75 @@ Adds EXTRA-FREE-PIXELS into the calculation."
     (frame-char-width (window-frame window)))
    0))
 
-(defun center-layout--frame-left-child (window)
-  "Return left most window container (or nil) of frame owning WINDOW."
-  (window-left-child (frame-root-window window)))
-
-(defun center-layout--window-eq-or-is-descendant (window ancestor)
-  "Return t if WINDOW is eq or is a descendant of ANCESTOR."
-  (cond
-   ((eq window ancestor) t)
-   ((not window) nil)
-   ((center-layout--window-eq-or-is-descendant
-     (window-parent window)
-     ancestor))))
-
 (defun center-layout--window-width-percentage (window)
   "Return WINDOW's width as a percentage out of the frame's width."
   (/ (float (window-total-width window))
      (frame-width (window-frame window))))
 
+(defun center-layout--window-at-side (window side)
+  "Return the window of frame owning WINDOW at SIDE.
+Return nil if the side has no window, or more than one window, or
+eq WINDOW, or is the minibuffer.  SIDE is same value supported by
+`window-at-side-list'."
+  (let ((frame (window-frame window)))
+    (and (not (eq window (minibuffer-window frame)))
+         (let ((windows (window-at-side-list frame side)))
+           (and (not (cdr windows))
+                (not (eq window (car windows)))
+                (car windows))))))
+
+(defun center-layout--sidebars (window)
+  "Return (LEFT-SIDEBAR . RIGHT-SIDEBAR) of WINDOW.
+A side window is considered a sidebar if it is at the edge of the
+frame, and can fit inside the margin of WINDOW on the side of the
+sidebar."
+  (let*
+      ((left-sidebar (center-layout--window-at-side window 'left))
+       (left-columns (if left-sidebar (window-pixel-width left-sidebar) 0))
+
+       (right-sidebar (center-layout--window-at-side window 'right))
+       (right-columns (if right-sidebar (window-pixel-width right-sidebar) 0)))
+
+    (cond
+
+     ((let* ((total-columns (+ left-columns right-columns))
+             (margins (center-layout--free-columns window total-columns)))
+        (and (< (window-total-width left-sidebar) (/ margins 2))
+             (< (window-total-width right-sidebar) (/ margins 2))
+             `(,left-sidebar . ,right-sidebar))))
+
+     ((let ((margins (center-layout--free-columns window left-columns)))
+        (and (< (window-total-width left-sidebar) (/ margins 2))
+             `(,left-sidebar . nil))))
+
+     ((let ((margins (center-layout--free-columns window right-columns)))
+        (and (< (window-total-width right-sidebar) (/ margins 2))
+             `(nil . ,right-sidebar))))
+
+     ('(nil . nil)))))
+
 (defun center-layout--compute-margins (window)
   "Compute (LEFT-MARGIN . RIGHT_MARGIN) for WINDOW."
-  (let*
-      ((left-side-window
-        (let ((left (center-layout--frame-left-child window)))
-          (if (or (center-layout--window-eq-or-is-descendant window left)
-                  (< (center-layout--window-width-percentage window) 0.4))
-              nil
-            left)))
+ (let*
+      ((sidebars (center-layout--sidebars window))
 
-       (left-side-window-pixels
-        (if left-side-window (window-pixel-width left-side-window) 0))
+       (left (car sidebars))
+       (left-pixels (if left (window-pixel-width left) 0))
+       (left-columns (if left (window-total-width left 'ceiling) 0))
 
-       (left-side-window-columns
-        (if left-side-window (window-total-width left-side-window 'ceiling) 0))
+       (right (cdr sidebars))
+       (right-pixels (if right (window-pixel-width right) 0))
+       (right-columns (if right (window-total-width right 'floor) 0))
 
-       (margins (center-layout--free-columns window left-side-window-pixels))
-       (margin-left (- (ceiling margins 2) left-side-window-columns))
+       (margins
+        (center-layout--free-columns
+         window
+         (+ left-pixels right-pixels)))
+
+       (margin-left (- (ceiling margins 2) left-columns))
        (margin-right
-        (if center-layout-apply-right-margin
-            (- margins left-side-window-pixels margin-left)
+        (if (with-selected-window window center-layout-apply-right-margin)
+            (- margins left-columns margin-left right-columns)
           0)))
 
     `(,(max 0 margin-left) .
