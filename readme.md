@@ -38,13 +38,14 @@ right exceeding `center-layout-columns`.
 
 ### Non-Global Customization
 
-To set non-global customization, use `setq-local` in your init file,
-for example, to set mode specific customization for `emacs-lisp-mode`:
+To set non-global customization, use `setq` in your init file, these
+customization options become buffer-local whenever they are set, for
+example, to set mode specific customization for `emacs-lisp-mode`:
 
 ```lisp
 (add-hook
  'emacs-lisp-mode-hook
  (lambda ()
-   (setq-local center-layout-apply-right-margin t)
-   (setq-local center-layout-columns 100)))
+   (setq center-layout-apply-right-margin t)
+   (setq center-layout-columns 100)))
 ```

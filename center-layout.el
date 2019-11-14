@@ -12,6 +12,7 @@
   "Width of centered content."
   :group 'center-layout
   :type 'number)
+(make-variable-buffer-local 'center-layout-columns)
 
 (defcustom center-layout-apply-right-margin nil
   "If t right margin will be applied also.
@@ -19,6 +20,7 @@ If nil no right margin will be applied, allowing longer lines to
 flow to the right exceeding `center-layout-columns'."
   :group 'center-layout
   :type 'boolean)
+(make-variable-buffer-local 'center-layout-apply-right-margin)
 
 (defun center-layout--window-body-preferred-pixels (window)
   "Return preferred body width for WINDOW.
@@ -28,7 +30,8 @@ neotree, treemacs etc, return their content width if it is
 greater, as typically they are used as dedicate bottom/side
 windows and have their own layout, limiting their width will
 cause undesired line wrapping/truncation."
-  (let ((pixels (* center-layout-columns (window-font-width window))))
+  (let ((pixels (* (with-selected-window window center-layout-columns)
+                   (window-font-width window))))
     (if (window-dedicated-p window)
         (max
          pixels
