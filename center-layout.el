@@ -45,12 +45,11 @@ cause undesired line wrapping/truncation."
                   (frame-fringe-width (window-frame window))))))
       pixels)))
 
-(defun center-layout--free-columns (window extra-free-pixels)
-  "Computes available columns for layout use for WINDOW.
-Adds EXTRA-FREE-PIXELS into the calculation."
+(defun center-layout--free-columns (window)
+  "Computes available columns for layout use for WINDOW."
   (max
    (ceiling
-    (- (+ (window-pixel-width window) extra-free-pixels)
+    (- (window-pixel-width window)
        (window-scroll-bar-width window)
        (window-right-divider-width window)
        (frame-fringe-width (window-frame window))
@@ -75,62 +74,15 @@ eq WINDOW, or is the minibuffer.  SIDE is same value supported by
                 (not (eq window (car windows)))
                 (car windows))))))
 
-(defun center-layout--sidebars (window)
-  "Return (LEFT-SIDEBAR . RIGHT-SIDEBAR) of WINDOW.
-A side window is considered a sidebar if it is at the edge of the
-frame, and can fit inside the margin of WINDOW on the side of the
-sidebar."
-  (let*
-      ((left-sidebar (center-layout--window-at-side window 'left))
-       (left-columns (if left-sidebar (window-pixel-width left-sidebar) 0))
-
-       (right-sidebar (center-layout--window-at-side window 'right))
-       (right-columns (if right-sidebar (window-pixel-width right-sidebar) 0)))
-
-    (cond
-
-     ((let* ((total-columns (+ left-columns right-columns))
-             (margins (center-layout--free-columns window total-columns)))
-        (and (< (window-total-width left-sidebar) (/ margins 2))
-             (< (window-total-width right-sidebar) (/ margins 2))
-             `(,left-sidebar . ,right-sidebar))))
-
-     ((let ((margins (center-layout--free-columns window left-columns)))
-        (and (< (window-total-width left-sidebar) (/ margins 2))
-             `(,left-sidebar . nil))))
-
-     ((let ((margins (center-layout--free-columns window right-columns)))
-        (and (< (window-total-width right-sidebar) (/ margins 2))
-             `(nil . ,right-sidebar))))
-
-     ('(nil . nil)))))
-
 (defun center-layout--compute-margins (window)
   "Compute (LEFT-MARGIN . RIGHT_MARGIN) for WINDOW."
- (let*
-      ((sidebars (center-layout--sidebars window))
-
-       (left (car sidebars))
-       (left-pixels (if left (window-pixel-width left) 0))
-       (left-columns (if left (window-total-width left 'ceiling) 0))
-
-       (right (cdr sidebars))
-       (right-pixels (if right (window-pixel-width right) 0))
-       (right-columns (if right (window-total-width right 'floor) 0))
-
-       (margins
-        (center-layout--free-columns
-         window
-         (+ left-pixels right-pixels)))
-
-       (margin-left (- (ceiling margins 2) left-columns))
-       (margin-right
-        (if (with-selected-window window center-layout-apply-right-margin)
-            (- margins left-columns margin-left right-columns)
-          0)))
-
-    `(,(max 0 margin-left) .
-      ,(max 0 margin-right))))
+  (let* ((margins (center-layout--free-columns window))
+         (margin-left (ceiling margins 2))
+         (margin-right
+          (if (with-selected-window window center-layout-apply-right-margin)
+              (- margins margin-left)
+            0)))
+    `(,margin-left . ,margin-right)))
 
 (defun center-layout--update-window (window)
   "Update margins for WINDOW."
