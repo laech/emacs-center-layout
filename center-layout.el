@@ -57,23 +57,6 @@ cause undesired line wrapping/truncation."
     (frame-char-width (window-frame window)))
    0))
 
-(defun center-layout--window-width-percentage (window)
-  "Return WINDOW's width as a percentage out of the frame's width."
-  (/ (float (window-total-width window))
-     (frame-width (window-frame window))))
-
-(defun center-layout--window-at-side (window side)
-  "Return the window of frame owning WINDOW at SIDE.
-Return nil if the side has no window, or more than one window, or
-eq WINDOW, or is the minibuffer.  SIDE is same value supported by
-`window-at-side-list'."
-  (let ((frame (window-frame window)))
-    (and (not (eq window (minibuffer-window frame)))
-         (let ((windows (window-at-side-list frame side)))
-           (and (not (cdr windows))
-                (not (eq window (car windows)))
-                (car windows))))))
-
 (defun center-layout--compute-margins (window)
   "Compute (LEFT-MARGIN . RIGHT_MARGIN) for WINDOW."
   (let* ((margins (center-layout--free-columns window))
@@ -124,9 +107,8 @@ increased/decreased to fill available space therefore they don't
 have a fixed size, giving desired split window behavior."
 
   (advice-add 'window-margins :around 'center-layout--window-margins-nil)
-  (let ((result (apply func args)))
-    (advice-remove 'window-margins 'center-layout--window-margins-nil)
-    result))
+  (unwind-protect (apply func args)
+    (advice-remove 'window-margins 'center-layout--window-margins-nil)))
 
 (define-minor-mode center-layout-mode
   "Toggle center layout mode."
