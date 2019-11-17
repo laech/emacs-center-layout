@@ -122,8 +122,8 @@ have a fixed size, giving desired split window behavior."
     (advice-add 'set-fringe-mode :after 'center-layout--advice)
     (advice-add 'window-min-size :around 'center-layout--window-min-size-around)
     (center-layout--update-frame))
-
-   ((remove-hook 'window-size-change-functions 'center-layout--update-frame)
+   (t
+    (remove-hook 'window-size-change-functions 'center-layout--update-frame)
     (remove-hook 'window-configuration-change-hook 'center-layout--update-frame)
     (remove-hook 'text-scale-mode-hook 'center-layout--update-frame)
     (remove-hook 'scroll-bar-mode-hook 'center-layout--update-frame)
