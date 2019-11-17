@@ -1,5 +1,7 @@
 ;; -*- flycheck-disabled-checkers: (emacs-lisp-checkdoc); -*-
 
+(require 'scroll-bar)
+
 (defmacro test (frame-width layout-columns apply-right-margin &rest body)
   `(save-window-excursion
      (let ((buffer (generate-new-buffer "*temp*")))

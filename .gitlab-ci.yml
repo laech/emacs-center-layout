@@ -1,0 +1,5 @@
+image: alpine:3.8.4
+
+test:
+  stage: test
+  script: apk --update add emacs-nox && emacs -Q -batch -l center-layout.el -l center-layout-test.el -f ert-run-tests-batch-and-exit
