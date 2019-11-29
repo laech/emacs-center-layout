@@ -5,7 +5,19 @@ windows by applying left and right margins.
 
 ## Installation
 
-TODO
+Clone the stable branch:
+
+```
+git clone -b stable https://gitlab.com/lae/emacs-center-layout.git
+```
+
+Initialize in your Emacs init file:
+
+```
+(add-to-list 'load-path "<path-to-cloned-directory>")
+(require 'center-layout)
+(center-layout-mode t)
+```
 
 ## Usage
 
