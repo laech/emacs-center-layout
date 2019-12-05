@@ -3,6 +3,8 @@
 Provides a global minor mode `center-layout-mode` for centering
 windows by applying left and right margins.
 
+![screenshot](screenshot.png)
+
 ## Installation
 
 Clone the stable branch:
@@ -16,7 +18,7 @@ Initialize in your Emacs init file:
 ```
 (add-to-list 'load-path "<path-to-cloned-directory>")
 (require 'center-layout)
-(center-layout-mode t)
+(center-layout-mode)
 ```
 
 ## Usage
@@ -24,7 +26,7 @@ Initialize in your Emacs init file:
 Invoke this within Emacs or place it in your init file:
 
 ```lisp
-(center-layout-mode t)
+(center-layout-mode)
 ```
 
 Alternatively you can also enable it within custom: <kbd>M-x</kbd>
