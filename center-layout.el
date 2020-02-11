@@ -100,10 +100,10 @@ Arguments from the adviced functions are IGNORED."
 ARGS will be passed to the function.
 
 `window-min-size' caculates the width by including the horizontal
-margins, and since `center-layout-mode' always dynamically sets
-the margins to fill available space (especially when
-`center-layout-apply-right-margin' is on), this causes Emacs to
-think that there is no available horizontal space anymore so
+margins, and since function `center-layout-mode' always
+dynamically sets the margins to fill available space (especially
+when `center-layout-apply-right-margin' is on), this causes Emacs
+to think that there is no available horizontal space anymore so
 spliting windows will always occur below, never to the side,
 which is undesirable, especially when trying to use side windows
 like neotree.
