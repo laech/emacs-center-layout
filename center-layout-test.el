@@ -70,6 +70,8 @@
          (unwind-protect
              (progn
                (switch-to-buffer buffer)
+               (defvar center-layout-columns)
+               (defvar center-layout-apply-right-margin)
                (setq center-layout-columns 60)
                (setq center-layout-apply-right-margin nil)
                (center-layout-mode 0)

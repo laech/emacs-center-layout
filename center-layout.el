@@ -1,6 +1,13 @@
-;;; center-layout.el --- Centers windows.
+;;; center-layout.el --- Centers windows. -*- lexical-binding: t; -*-
+
+;; Homepage: https://gitlab.com/lae/emacs-center-layout
+;; Package-Version: 0.1.1
+;; Package-Requires: ((emacs "25.1"))
 
 ;;; Commentary:
+
+;; Provides a global minor mode center-layout-mode for centering
+;; windows by applying left and right margins.
 
 ;;; Code:
 
@@ -84,7 +91,7 @@ cause undesired line wrapping/truncation."
 Arguments from the adviced functions are IGNORED."
   (center-layout--update-frame))
 
-(defun center-layout--window-margins-nil (&rest args)
+(defun center-layout--window-margins-nil (&rest _)
   "Always return '(nil) - no margins, ARGS are ignored."
   (list nil))
 
@@ -110,6 +117,7 @@ have a fixed size, giving desired split window behavior."
   (unwind-protect (apply func args)
     (advice-remove 'window-margins 'center-layout--window-margins-nil)))
 
+;;;###autoload
 (define-minor-mode center-layout-mode
   "Toggle center layout mode."
   :global t
