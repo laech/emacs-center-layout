@@ -1,4 +1,4 @@
-;;; center-layout.el --- Centers windows. -*- lexical-binding: t; -*-
+;;; center-layout.el --- Centers windows -*- lexical-binding: t; -*-
 
 ;; Homepage: https://gitlab.com/lae/emacs-center-layout
 ;; Package-Version: 0.1.1

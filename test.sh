@@ -2,10 +2,11 @@
 
 set -o errexit
 set -o nounset
+set -o xtrace
 
 readonly init_package_el="(progn \
   (require 'package) \
-  (push '(\"melpa\" . \"https://melpa.org/packages/\") package-archives) \
+  (push '(\"melpa\" . \"http://melpa.org/packages/\") package-archives) \
   (package-initialize) \
   (unless package-archive-contents \
      (package-refresh-contents)) \
