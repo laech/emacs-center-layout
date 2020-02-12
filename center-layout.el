@@ -3,6 +3,7 @@
 ;; Homepage: https://gitlab.com/lae/emacs-center-layout
 ;; Package-Version: 0.1.1
 ;; Package-Requires: ((emacs "25.1"))
+;; Keywords: convenience, tools
 
 ;;; Commentary:
 
@@ -102,11 +103,11 @@ ARGS will be passed to the function.
 `window-min-size' caculates the width by including the horizontal
 margins, and since function `center-layout-mode' always
 dynamically sets the margins to fill available space (especially
-when `center-layout-apply-right-margin' is on), this causes Emacs
-to think that there is no available horizontal space anymore so
-spliting windows will always occur below, never to the side,
-which is undesirable, especially when trying to use side windows
-like neotree.
+when `center-layout-apply-right-margin' is non-nil), this causes
+Emacs to think that there is no available horizontal space
+anymore so spliting windows will always occur below, never to the
+side, which is undesirable, especially when trying to use side
+windows like neotree.
 
 This advice will remove the horizontal margins from the result
 which is correct behaviour since margins will be dynamically
