@@ -1,0 +1,5 @@
+*
+!center-layout.el
+!center-layout-test.el
+!makefile
+!test.sh
