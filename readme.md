@@ -9,29 +9,17 @@ windows by applying left and right margins.
 
 Clone the stable branch:
 
-```
+```shell
 git clone -b stable https://gitlab.com/lae/emacs-center-layout.git
 ```
 
-Initialize in your Emacs init file:
+Add to your Emacs init file:
 
-```
+```elisp
 (add-to-list 'load-path "<path-to-cloned-directory>")
 (require 'center-layout)
 (center-layout-mode)
 ```
-
-## Usage
-
-Invoke this within Emacs or place it in your init file:
-
-```lisp
-(center-layout-mode)
-```
-
-Alternatively you can also enable it within custom: <kbd>M-x</kbd>
-`customize-variable` <kbd>return</kbd> `center-layout-mode`
-<kbd>return</kbd>.
 
 ## Customization
 
